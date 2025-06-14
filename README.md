@@ -14,17 +14,7 @@ $ pip3 install --user adafruit-nrfutil
 
 Officially supported boards are:
 
-- [Adafruit CLUE](https://www.adafruit.com/product/4500)
-- [Adafruit Circuit Playground Bluefruit](https://www.adafruit.com/product/4333)
-- [Adafruit Feather nRF52832](https://www.adafruit.com/product/3406)
-- [Adafruit Feather nRF52840 Express](https://www.adafruit.com/product/4062)
-- [Adafruit Feather nRF52840 Sense](https://www.adafruit.com/product/4516)
-- [Adafruit ItsyBitsy nRF52840 Express](https://www.adafruit.com/product/4481)
-- [Adafruit LED Glasses Driver nRF52840](https://www.adafruit.com/product/5217)
-- Adafruit Metro nRF52840 Express
-- [Raytac MDBT50Q-RX Dongle](https://www.adafruit.com/product/5199)
-
-In addition, there is also lots of other 3rd-party boards which are added by other makers, users and community. Check out the [complete list of all boards here](/src/boards).
+- nRF52833 DK
 
 ## Features
 
@@ -40,56 +30,7 @@ There are two pins, `DFU` and `FRST` that bootloader will check upon reset/power
 - `Double Reset` Reset twice within 500 ms will enter DFU with UF2 and CDC support (only works with nRF52840)
 - `DFU = LOW` and `FRST = HIGH`: Enter bootloader with UF2 and CDC support
 - `DFU = LOW` and `FRST = LOW`: Enter bootloader with OTA, to upgrade with a mobile application such as Nordic nrfConnect/Toolbox
-- <s>`DFU = HIGH` and `FRST = LOW`: Factory Reset mode: erase firmware application and its data</s>
 - `DFU = HIGH` and `FRST = HIGH`: Go to application code if it is present, otherwise enter DFU with UF2
-- The `GPREGRET` register can also be set to force the bootloader can enter any of above modes (plus a CDC-only mode for Arduino).
-`GPREGRET` is set by the application before performing a soft reset.
-
-```c
-#include "nrf_nvic.h"
-void reset_to_uf2(void) {
-  NRF_POWER->GPREGRET = 0x57; // 0xA8 OTA, 0x4e Serial
-  NVIC_SystemReset();         // or sd_nvic_SystemReset();
-}
-```
-
-On the Nordic PCA10056 DK board, `DFU` is connected to **Button1**, and `FRST` is connected to **Button2**.
-So holding down **Button1** while clicking **RESET** will put the board into USB bootloader mode, with UF2 and CDC support.
-Holding down **Button2** while clicking **RESET** will put the board into OTA (over-the-air) bootloader mode.
-
-On the Nordic PCA10059 Dongle board, `DFU` is connected to the white button.
-`FRST` is connected to pin 1.10. Ground it to pull `FRST` low, as if you had pushed an `FRST`  button.
-There is an adjacent ground pad.
-
-For other boards, please check the board definition for details.
-
-### Making your own UF2
-
-To create your own UF2 DFU update image, simply use the [Python conversion script](https://github.com/Microsoft/uf2/blob/master/utils/uf2conv.py) on a .bin file or .hex file, specifying the family as **0xADA52840** (nRF52840) or **0x621E937A** (nRF52833).
-
-```
-nRF52840
-uf2conv.py firmware.hex -c -f 0xADA52840
-
-nRF52833
-uf2conv.py firmware.hex -c -f 0x621E937A
-```
-
-If using a .bin file with the conversion script you must specify application address with the -b switch, this address depend on the SoftDevice size/version e.g S140 v6 is 0x26000, v7 is 0x27000
-
-```
-nRF52840
-uf2conv.py firmware.bin -c -b 0x26000 -f 0xADA52840
-
-nRF52833
-uf2conv.py firmware.bin -c -b 0x27000 -f 0x621E937A
-```
-
-To create a UF2 image for bootloader from a .hex file using separated family of **0xd663823c**
-
-```
-uf2conv.py bootloader.hex -c -f 0xd663823c
-```
 
 ## Burn & Upgrade with pre-built binaries
 
